@@ -209,6 +209,7 @@ namespace
                  && JUCE_STAT (fileName.toUTF8(), &info) == 0;
     }
 
+#ifndef __HAIKU__
     // if this file doesn't exist, find a parent of it that does..
     bool juce_doStatFS (File f, struct statfs& result)
     {
@@ -222,6 +223,7 @@ namespace
 
         return statfs (f.getFullPathName().toUTF8(), &result) == 0;
     }
+#endif
 
    #if (JUCE_MAC && MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5) || JUCE_IOS
     static int64 getCreationTime (const juce_statStruct& s) noexcept     { return (int64) s.st_birthtime; }
@@ -353,11 +355,19 @@ bool File::setFileTimesInternal (int64 modificationTime, int64 accessTime, int64
 
     if ((modificationTime != 0 || accessTime != 0) && juce_stat (fullPath, info))
     {
+#ifdef __HAIKU__
+        struct timespec times[2];
+        times[0].tv_sec  = accessTime != 0       ? (time_t) (accessTime / 1000)       : info.st_atime;
+        times[1].tv_sec = modificationTime != 0 ? (time_t) (modificationTime / 1000) : info.st_mtime;
+
+        return utimensat (AT_FDCWD, fullPath.toUTF8(), times, 0) == 0;
+#else
         struct utimbuf times;
         times.actime  = accessTime != 0       ? (time_t) (accessTime / 1000)       : info.st_atime;
         times.modtime = modificationTime != 0 ? (time_t) (modificationTime / 1000) : info.st_mtime;
 
         return utime (fullPath.toUTF8(), &times) == 0;
+#endif
     }
 
     return false;
@@ -559,7 +569,11 @@ void MemoryMappedFile::openInternal (const File& file, AccessMode mode)
         if (m != MAP_FAILED)
         {
             address = m;
+#ifdef __HAIKU__
+            posix_madvise (m, (size_t) range.getLength(), POSIX_MADV_SEQUENTIAL);
+#else
             madvise (m, (size_t) range.getLength(), MADV_SEQUENTIAL);
+#endif
         }
         else
         {
@@ -608,19 +622,21 @@ File juce_getExecutableFile()
 //==============================================================================
 int64 File::getBytesFreeOnVolume() const
 {
+#ifndef __HAIKU__
     struct statfs buf;
     if (juce_doStatFS (*this, buf))
         return (int64) buf.f_bsize * (int64) buf.f_bavail; // Note: this returns space available to non-super user
-
+#endif
     return 0;
 }
 
 int64 File::getVolumeTotalSize() const
 {
+#ifndef __HAIKU__
     struct statfs buf;
     if (juce_doStatFS (*this, buf))
         return (int64) buf.f_bsize * (int64) buf.f_blocks;
-
+#endif
     return 0;
 }
 

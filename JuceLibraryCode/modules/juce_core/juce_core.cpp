@@ -97,7 +97,7 @@
  #include <net/if.h>
  #include <sys/ioctl.h>
 
- #if ! JUCE_ANDROID
+ #if ! JUCE_ANDROID && ! JUCE_HAIKU
   #include <execinfo.h>
  #endif
 #endif
@@ -109,6 +109,16 @@
 
 #if JUCE_ANDROID
  #include <android/log.h>
+#endif
+
+#if JUCE_HAIKU
+ #include <dirent.h>
+ #include <errno.h>
+ #include <fnmatch.h>
+ #include <sys/sockio.h>
+ #include <sys/mman.h>
+ #include <dlfcn.h>
+ #include <curl/curl.h>
 #endif
 
 //==============================================================================
@@ -229,6 +239,12 @@ namespace juce
 #include "native/juce_android_SystemStats.cpp"
 #include "native/juce_android_Threads.cpp"
 
+//==============================================================================
+#elif JUCE_HAIKU
+#include "native/juce_linux_CommonFile.cpp"
+#include "native/juce_curl_Network.cpp"
+#include "native/juce_haiku_Files.cpp"
+#include "native/juce_haiku_SystemStats.cpp"
 #endif
 
 #include "threads/juce_ChildProcess.cpp"

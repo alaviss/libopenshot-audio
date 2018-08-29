@@ -215,6 +215,14 @@ namespace juce
   #include "native/juce_android_OpenSL.cpp"
  #endif
 
+//==============================================================================
+#elif JUCE_HAIKU
+ #include "native/juce_haiku_Midi.cpp"
+
+ #if JUCE_USE_CDREADER
+  #include "native/juce_linux_AudioCDReader.cpp"
+ #endif
+
 #endif
 
 #if ! JUCE_SYSTEMAUDIOVOL_IMPLEMENTED

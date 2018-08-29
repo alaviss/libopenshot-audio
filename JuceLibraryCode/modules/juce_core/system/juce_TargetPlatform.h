@@ -66,6 +66,8 @@
   #endif
 #elif defined (__FreeBSD__)
   #define       JUCE_BSD 1
+#elif defined (__HAIKU__)
+  #define       JUCE_HAIKU 1
 #else
   #error "Unknown platform!"
 #endif
@@ -140,7 +142,7 @@
 #endif
 
 //==============================================================================
-#if JUCE_LINUX || JUCE_ANDROID
+#if JUCE_LINUX || JUCE_ANDROID || JUCE_HAIKU
 
   #ifdef _DEBUG
     #define JUCE_DEBUG 1

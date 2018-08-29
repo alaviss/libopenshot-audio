@@ -73,6 +73,11 @@
  #ifndef JUCE_USE_FREETYPE
   #define JUCE_USE_FREETYPE 1
  #endif
+
+#elif JUCE_HAIKU
+ #ifndef JUCE_USE_FREETYPE
+  #define JUCE_USE_FREETYPE 1
+ #endif
 #endif
 
 #if JUCE_USE_FREETYPE
@@ -152,6 +157,9 @@ namespace juce
  #include "../juce_core/native/juce_android_JNIHelpers.h"
  #include "native/juce_android_GraphicsContext.cpp"
  #include "native/juce_android_Fonts.cpp"
+
+#elif JUCE_HAIKU
+ #include "native/juce_haiku_Fonts.cpp"
 
 #endif
 }

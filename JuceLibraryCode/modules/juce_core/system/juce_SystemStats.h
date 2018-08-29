@@ -56,6 +56,7 @@ public:
         Linux           = 0x0400,
         Android         = 0x0800,
         iOS             = 0x1000,
+        Haiku           = 0x2000,
 
         MacOSX_10_4     = MacOSX | 4,
         MacOSX_10_5     = MacOSX | 5,
